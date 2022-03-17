@@ -1,6 +1,7 @@
 import tkinter
 import who_is_your_bff_engine as bff
 import Plotting
+import matplotlib.pyplot as plt
 
 name = 'Who is Your BFF?'
 root = tkinter.Tk()
@@ -22,11 +23,12 @@ root.rowconfigure(6, weight=1)
 
 
 go_button = tkinter.Button(root, height=2, width=12, font='Helvetica 12 bold',
-                           command=lambda: Plotting.plot_cloud(),
+                           command=lambda: Plotting.plot_worldcloud(),
                            text='Print Wordcloud')
 go_button.grid(row=3, column=1)
 
 exit_button = tkinter.Button(root, height=1, width=13, text='EXIT', command=root.quit, font='Helvetica 10 bold')
 exit_button.grid(row=5, column=1)
 
+plt.show()
 root.mainloop()

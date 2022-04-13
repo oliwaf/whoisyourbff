@@ -3,10 +3,11 @@ import matplotlib.pyplot as plt
 
 # Define a function to plot word cloud
 
-df_most_common_words, df_counts = bff.most_common_words()
+
 
 
 def plot_worldcloud():
+    df_most_common_words, df_counts = bff.most_common_words()
 
     import wordcloud
     # Set figure size
@@ -21,8 +22,7 @@ def plot_worldcloud():
     plt.imshow(wordcloud)
     # No axis details
     plt.axis("off")
-
-
+    plt.show()
 
 
 def plot_bar():
@@ -31,22 +31,12 @@ def plot_bar():
     for container in ax.containers:
         ax.bar_label(container)
     plt.tight_layout()
+    plt.show()
 
 
-a, b = bff.time_of_messages()
+def plot_line_hours():
 
-
-def plot_line_hours(dataframe):
-
-    a = dataframe['Sender name'].iloc[0]
-    b = dataframe['User name'].iloc[0]
-    figure, axs = plt.subplots()
-    axs.plot(dataframe['Time'], dataframe['Sender'], label=a)
-    axs.plot(dataframe['Time'], dataframe['User'], label=b)
-    axs.legend(loc='best')
-
-
-def plot_line_days(dataframe):
+    z, dataframe = bff.time_of_messages()
 
     a = dataframe['Sender name'].iloc[0]
     b = dataframe['User name'].iloc[0]
@@ -54,15 +44,24 @@ def plot_line_days(dataframe):
     axs.plot(dataframe['Time'], dataframe['Sender'], label=a)
     axs.plot(dataframe['Time'], dataframe['User'], label=b)
     axs.legend(loc='best')
+    plt.show()
 
-# Plot
+def plot_line_days():
 
-plot_line_hours(a)
-plot_line_days(b)
-plot_worldcloud()
+    dataframe, z = bff.time_of_messages()
+
+    a = dataframe['Sender name'].iloc[0]
+    b = dataframe['User name'].iloc[0]
+    figure, axs = plt.subplots()
+    axs.plot(dataframe['Time'], dataframe['Sender'], label=a)
+    axs.plot(dataframe['Time'], dataframe['User'], label=b)
+    axs.legend(loc='best')
+    plt.show()
 
 
-plt.show()
+
+
+
 
 
 

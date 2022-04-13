@@ -1,20 +1,18 @@
 import re
 import json
 import collections
+import numpy as np
 import pandas
 import os
 from functools import partial
 from datetime import datetime
 import timeit
+import tkinter
 
 
 tic = timeit.default_timer()
 
-
-# path = r'C:\Users\oliwa\IdeaProjects\messages\inbox'
-path = r'C:\Users\oliwa\IdeaProjects\messages\test'
-path1 = r'C:\Users\oliwa\IdeaProjects\messages\inbox\przemekwozniak_alao0wckwg'
-
+# path1 = r'C:\Users\oliwa\IdeaProjects\messages\inbox\przemekwozniak_alao0wckwg'
 
 fix_mojibake_escapes = partial(
     re.compile(rb'\\u00([\da-f]{2})').sub,
@@ -37,35 +35,19 @@ def words(s):
     return re.findall(regex, s)
 
 
-# iterate through all files and returning most common words from conversation
-# received by words divided by special character.
-def most_common_words():
-    dataframe1 = pandas.DataFrame(columns=['word', 'times'])
+folder_path = None
 
-    for file in os.listdir(path1):
 
-        if file.endswith(".json"):
-            file_path = fr"{path1}\{file}"
-            message_variable = read_text_file(file_path)['messages']
-            counts = collections.Counter((w.lower() for e in message_variable for w in words(e.get('content', ''))))
-            counts1 = sum(collections.Counter((w.lower() for e in message_variable for w in words(e.get('content', '')))
-                                              ).values())
-            most_common = counts.most_common()
-            dataframe = pandas.DataFrame(most_common, columns=['word', 'times'])
-            dataframe1 = pandas.concat([dataframe, dataframe1])
-            dataframe1 = pandas.concat(
-                [dataframe1, pandas.DataFrame(data={'word': ['Sum_of_Words'], 'times': [counts1]})])
-
-            # print(tuple(w.lower() for e in message_variable for w in words(e.get('content', ''))))
-
-    dataframe1 = dataframe1.groupby(['word']).sum()
-    dataframe1 = dataframe1.sort_values(['times'], ascending=False).reset_index()
-
-    return dataframe1, counts
+def get_path():
+    global folder_path
+    folder_path = str(tkinter.filedialog.askdirectory())
+    return folder_path
 
 
 # data frame with sum of words every friend
 def number_of_words_frame():
+
+    path = str(tkinter.filedialog.askdirectory(title='Select inbox directory from messages'))
     dataframe1 = pandas.DataFrame(columns=['words', 'sender'])
 
     for directories in os.listdir(path):
@@ -93,6 +75,33 @@ def number_of_words_frame():
     return dataframe1
 
 
+# iterate through all files and returning most common words from conversation
+# received by words divided by special character.
+def most_common_words():
+    dataframe1 = pandas.DataFrame(columns=['word', 'times'])
+
+    for file in os.listdir(folder_path):
+
+        if file.endswith(".json"):
+            file_path = fr"{folder_path}\{file}"
+            message_variable = read_text_file(file_path)['messages']
+            counts = collections.Counter((w.lower() for e in message_variable for w in words(e.get('content', ''))))
+            counts1 = sum(collections.Counter((w.lower() for e in message_variable for w in words(e.get('content', '')))
+                                              ).values())
+            most_common = counts.most_common()
+            dataframe = pandas.DataFrame(most_common, columns=['word', 'times'])
+            dataframe1 = pandas.concat([dataframe, dataframe1])
+            dataframe1 = pandas.concat(
+                [dataframe1, pandas.DataFrame(data={'word': ['Sum_of_Words'], 'times': [counts1]})])
+
+            # print(tuple(w.lower() for e in message_variable for w in words(e.get('content', ''))))
+
+    dataframe1 = dataframe1.groupby(['word']).sum()
+    dataframe1 = dataframe1.sort_values(['times'], ascending=False).reset_index()
+
+    return dataframe1, counts
+
+
 def time_of_messages():
 
     dataframe1 = pandas.DataFrame()
@@ -102,9 +111,9 @@ def time_of_messages():
 
         dataframe = pandas.DataFrame()
 
-        for file in os.listdir(path1):
+        for file in os.listdir(folder_path):
             if file.endswith(".json"):
-                file_path = fr"{path1}\{file}"
+                file_path = fr"{folder_path}\{file}"
                 for i in read_text_file(file_path)["messages"]:
                     z = datetime.fromtimestamp(i.get('timestamp_ms')/1000.0)
                     date = z.strftime("%A")
@@ -155,11 +164,6 @@ def remove_short_phrases(df_with_frequencies):
         if len(i) <= 2 and i != 'ok' and i != 'xd':
             del df_with_frequencies[f'{i}']
     return df_with_frequencies
-
-
-x = number_of_words_frame()
-z = most_common_words()
-
 
 
 toc = timeit.default_timer()
